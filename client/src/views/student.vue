@@ -79,7 +79,10 @@ export default {
       // 创建输出端 PeerConnection
       let PeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
       this.peer = new PeerConnection(this.iceServers);
-      this.peer.addStream(this.localstream); // 添加本地流
+      //this.peer.addStream(this.localstream); // 添加本地流,过时
+      for (const track of this.localstream.getTracks()) {
+        this.peer.addTrack(track, this.localstream);
+      }
       // 监听ICE候选信息 如果收集到，就发送给对方
       this.peer.onicecandidate = (event) => {
         console.log('生成学生sdp')
@@ -87,10 +90,15 @@ export default {
           socket.emit('Server-ICE', {from: 'student', to: 'teacher', sdp: event.candidate});
         }
       };
-      this.peer.onaddstream = (event) => { // 监听是否有媒体流接入，如果有就赋值给 rtcB 的 src
-        console.log('学生获取新增流')
+      // this.peer.onaddstream = (event) => { // 监听是否有媒体流接入，如果有就赋值给 rtcB 的 src
+      //   console.log('学生获取新增流')
+      //   let video = document.querySelector('#rtcB');
+      //   video.srcObject = event.stream;
+      // };
+      this.peer.ontrack = (event) => { // 监听是否有媒体流接入，如果有就赋值给 rtcB 的 src
+        console.log('学生获取新增流', event)
         let video = document.querySelector('#rtcB');
-        video.srcObject = event.stream;
+        video.srcObject = event.streams[0];
       };
       //this.createOffer()
       socket.on('Client-ICE', data => {
