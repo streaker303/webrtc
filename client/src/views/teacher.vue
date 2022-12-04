@@ -4,11 +4,11 @@
     <div class="content ub ub-pj">
       <div class="ub ub-ver">
         My
-        <video src="" id="rtcA" controls autoplay></video>
+        <video src="" id="rtcA" muted controls autoplay></video>
       </div>
       <div class="ub ub-ver">
         Remote-student
-        <video src="" id="rtcB" controls autoplay></video>
+        <video src="" id="rtcB" muted controls autoplay></video>
         <button @click="initPeer">呼叫学生</button>
       </div>
     </div>
