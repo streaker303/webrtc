@@ -51,6 +51,7 @@ export default {
       }
       this.initPeer(data); // 获取到媒体流后，调用函数初始化 RTCPeerConnection
     },
+
     async onOffer(data) { // 接收offer并发送 answer
       try {
         // 接收端设置远程 offer 描述
@@ -65,6 +66,7 @@ export default {
         console.log('onOffer: ', e);
       }
     },
+
     async onIce(data) { // 接收 ICE 候选
       if (data.from === 'student') return
       try {
@@ -73,6 +75,7 @@ export default {
         console.log('onAnswer: ', e);
       }
     },
+
     initPeer() {
       // 创建输出端 PeerConnection
       let PeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
@@ -92,9 +95,8 @@ export default {
         let video = document.querySelector('#rtcB');
         video.srcObject = event.streams[0];
       };
-      //this.createOffer()
-      socket.on('Client-ICE', data => this.onIce(data))
       socket.on('Client-Offer', data => this.onOffer(data))
+      socket.on('Client-ICE', data => this.onIce(data))
     },
   },
 }
