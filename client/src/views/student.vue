@@ -82,7 +82,7 @@ export default {
       }
       // 监听ICE候选信息 如果收集到，就发送给对方
       this.peer.onicecandidate = (event) => {
-        console.log('生成学生sdp')
+        console.log('生成学生candidate')
         if (event.candidate) {
           socket.emit('Server-ICE', {from: 'student', to: 'teacher', candidate: event.candidate});
         }
