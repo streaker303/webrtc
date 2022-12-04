@@ -17,6 +17,7 @@
 
 <script>
 import socket from '../utils/socket'
+
 export default {
   name: "teacher",
   data() {
@@ -25,11 +26,9 @@ export default {
       localstream: '',
       iceServers: {
         "iceServers": [
-          {
-            "url": "stun:stun.l.google.com:19302"
-          },
-          {"url":"stun:119.29.157.161:3478"},
-          {"url":"turn:119.29.157.161:3478","credential":"123456","username":"admin"}
+          {"url": "stun:stun.l.google.com:19302"},
+          {"url": "stun:119.29.157.161:3478"},
+          {"url": "turn:119.29.157.161:3478", "credential": "123456", "username": "admin"}
         ]
       },
       offerOption: {
@@ -45,7 +44,8 @@ export default {
     async createMedia(data) {
       // 保存本地流到全局
       try {
-        this.localstream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+        this.localstream = await navigator.mediaDevices.getUserMedia({audio: true, video: true});
+        console.log(this.localstream, '本地媒体流')
         let video = document.querySelector('#rtcA');
         video.srcObject = this.localstream;
       } catch (e) {
@@ -57,6 +57,7 @@ export default {
       try {
         // 创建offer
         let offer = await this.peer.createOffer(this.offerOption);
+        console.log('老师sdp信息', offer)
         // 呼叫端设置本地 offer 描述
         await this.peer.setLocalDescription(offer);
         // 给对方发送 offer
@@ -68,7 +69,7 @@ export default {
     async onIce(data) { // 接收 ICE 候选
       if (data.from === 'teacher') return
       try {
-        await this.peer.addIceCandidate(data.sdp); // 设置远程 ICE
+        await this.peer.addIceCandidate(data.candidate); // 设置远程 ICE
       } catch (e) {
         console.log('onAnswer: ', e);
       }
@@ -91,12 +92,12 @@ export default {
       }
       // 监听ICE候选信息 如果收集到，就发送给对方
       this.peer.onicecandidate = (event) => {
-        console.log('生成老师sdp')
+        console.log('获取老师网络信息', event.candidate)
         if (event.candidate) {
-          socket.emit('Server-ICE', {from: 'teacher', to: 'student', sdp: event.candidate});
+          socket.emit('Server-ICE', {from: 'teacher', to: 'student', candidate: event.candidate});
         }
       };
-      // this.peer.onaddstream = (event) => { // 监听是否有媒体流接入，如果有就赋值给 rtcB 的 src
+      // this.peer.onaddstream = (event) => {
       //   console.log('老师获取新增流')
       //   let video = document.querySelector('#rtcB');
       //   video.srcObject = event.stream;
@@ -108,13 +109,8 @@ export default {
       };
 
       this.createOffer()
-      socket.on('Client-ICE', data => {
-        //console.log(data)
-        this.onIce(data)
-      })
-      socket.on('Client-Answer', data => {
-        this.onAnswer(data)
-      })
+      socket.on('Client-ICE', data => this.onIce(data))
+      socket.on('Client-Answer', data => this.onAnswer(data))
     },
   },
 }
@@ -126,6 +122,7 @@ export default {
   height: 500px;
   border: 2px solid greenyellow;
 }
+
 video {
   width: 400px;
   height: 400px;

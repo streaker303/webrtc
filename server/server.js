@@ -22,7 +22,6 @@ server.listen(9000, ()=>{console.log('port 9000 is on')});
 io.on('connection', function (socket) {
 	console.log('连接成功')
 
-	/*一对一*/
 	socket.on('Server-ICE', function (data) {
 		//console.log('ice-触发', data)
 		socket.broadcast.emit('Client-ICE', data);
