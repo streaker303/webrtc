@@ -86,7 +86,7 @@ export default {
       // 创建输出端 PeerConnection
       let PeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
       this.peer = new PeerConnection(this.iceServers);
-      // 添加本地流,过时了
+      // 添加本地流
       for (const track of this.localstream.getTracks()) {
         this.peer.addTrack(track, this.localstream);
       }
